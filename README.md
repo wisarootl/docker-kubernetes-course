@@ -69,6 +69,7 @@ CMD ["node", "server.js"]
 - Detached mode : run in background, not block terminal, not get logs in terminal
 - Interactive mode : combine with attached mode and can get output and pass input
 - `docker start -a -i <container-name>` : start docker in interactive mode
+- `docker stop <container-name> <container-name> ...` : stop containers
 - `docker rm <container-name> <container-name> ... ` : remove container
 - `docker
 - `docker images` : list all docker image
@@ -115,3 +116,47 @@ CMD ["node", "server.js"]
   - dockerfile `ARG DEFAULT_PORT=80` : assign argument in dockerfile
   - dockerfile `ENV PORT $DEFAULT_PORT` : use argument in dockerfile
   - command line `docker build -t feedback-node:dev --build-arg DEFAULT_PORT=8000 .` : override argument when creating image
+
+# 4. Networking: Container Communication
+
+- `docker network create favorites-net` : create network
+
+- `docker network create --driver bridge favorites-net` : create network with bridge driver (no need to specify because bridge driver is default value)
+
+  - bridge : default driver and most common in majority of scenarios
+  - host : For standalone containers, isolation between container and host system is removed (i.e. they share localhost as a network)
+  - overlay : Multiple Docker daemons (i.e. Docker running on different machines) are able to connect with each other. Only works in "Swarm" mode which is a dated / almost deprecated way of connecting multiple containers
+  - macvlan : You can set a custom MAC address to a container - this address can then be used for communication with that container
+  - none : All networking is disabled.
+  - Third-party plugins : You can install third-party plugins which then may add all kinds of behaviors and functionalities
+
+# 5. Building Multi-Container Application with Docker
+
+- `docker run --name mongodb --rm -d --network goals-net mongo` : create container for mongodb (from docker hub)
+- `docker build -t goals-node .` : build container image for backend
+- `docker build -t goals-react .` : build container image for front end
+- `docker run --name goals-backend --rm -d -p 80:80 goals-node` : run docker container
+- `docker run --name goals-frontend --rm -p 3000:3000 -it goals-react` : run docker container for frontend (don't forget -it for React)
+
+- put them in network
+- `docker network create goals-net` : create network
+- `docker run --name mongodb --rm -d --network goals-net mongo` : create container for mongodb (from docker hub)
+- `docker run --name goals-backend --rm -d -p 80:80 --network goals-net goals-node` : run docker container. publish port (-p 80:80) to communication with react
+- `docker run --name goals-frontend --rm -p 3000:3000 -it goals-react` : run docker container for frontend (don't forget -it for React). we still need to publish port (-p 3000:3000) because we want frontend to be connected from host
+
+add persistent volume
+
+- `docker run --name mongodb -v data:/data/db --rm -d --network goals-net mongo` : create volume for persistent data
+
+add variable for security in mongodb
+
+- `docker run --name mongodb -v data:/data/db --rm -d --network goals-net -e MONGO_INITDB_ROOT_USERNAME=max -e MONGO_INITDB_ROOT_PASSWORD=secret mongo`
+
+add volume for backend
+
+- `docker run --name goals-backend -v <local-backend-repo-path>:/app -v logs:/app/logs -v /app/node_modules --rm -d -p 80:80 --network goals-net goals-node` this is not work with windows due to `<local-backend-repo-path>` issue
+- `docker run --name goals-backend -v logs:/app/logs --rm -d -p 80:80 --network goals-net goals-node`
+
+add variable
+
+- `docker run --name goals-backend -v logs:/app/logs -e MONGODB_USERNAME=max --rm -d -p 80:80 --network goals-net goals-node`
