@@ -1,0 +1,57 @@
+version: '3.8'
+services:
+  mongodb:
+    # images can be speicified as local image name,
+    # dockerhub image name, dockerhub repo, full url
+    image: 'mongo'
+    volumes:
+      - data:/data/db
+
+    # manually specify name for the container
+    # container_name: mongodb
+
+    # env_file:
+    #   - ./env/mongo.env
+    # alternative to env_file
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: max
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    #   # - MONGO_INITDM_ROOT_USEERNAME=max
+    # no need to specify network because docker do for us
+  backend:
+    build: ./backend
+    # build:
+    #   context: ./
+    #   dockerfile: dockerfile
+    #   args:
+    #     some-arg: 1
+
+    ports:
+      - '80:80'
+
+    volumes:
+      - logs:/app/logs
+      - ./backend:/app
+      - /app/node_modules
+
+    env_file:
+      - ./env/backend.env
+
+    depends_on:
+      - mongodb
+      # - other-container
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/app/src
+    stdin_open: true # for -it
+    tty: true # for -it
+    depends_on:
+      - backend
+
+volumes:
+  data:
+  logs:

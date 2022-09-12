@@ -160,3 +160,8 @@ add volume for backend
 add variable
 
 - `docker run --name goals-backend -v logs:/app/logs -e MONGODB_USERNAME=max --rm -d -p 80:80 --network goals-net goals-node`
+
+# 6. Docker Compose
+
+- `docker-compose up -d` : start compose in detach mode
+- `docker-compose down` : stop compose
