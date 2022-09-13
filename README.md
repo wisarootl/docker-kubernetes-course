@@ -171,3 +171,5 @@ add variable
 - `docker run -it -d node` : run node from docker hub image
 - `docker exec <container-name> npm init` : execute command inside container
 - `docker run -it node npm init` : run node + execute command
+
+# 8. Complex Project
