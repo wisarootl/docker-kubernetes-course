@@ -165,3 +165,9 @@ add variable
 
 - `docker-compose up -d` : start compose in detach mode
 - `docker-compose down` : stop compose
+
+# 7. Utility Containers
+
+- `docker run -it -d node` : run node from docker hub image
+- `docker exec <container-name> npm init` : execute command inside container
+- `docker run -it node npm init` : run node + execute command
