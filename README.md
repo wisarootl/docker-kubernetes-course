@@ -173,3 +173,7 @@ add variable
 - `docker run -it node npm init` : run node + execute command
 
 # 8. Complex Project
+
+- ` docker-compose run --rm composer create-project --prefer-dist laravel/laravel .` init laravel (get source code)
+- `docker-compose up -d --build server` run docker composer and force build
+- `docker-compose down` : down docker-composer
