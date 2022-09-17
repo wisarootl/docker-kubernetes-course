@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: story-deployment
-spec: 
+spec:
   replicas: 2
   selector:
     matchLabels:
@@ -18,7 +18,7 @@ spec:
           env:
             - name: STORY_FOLDER
               # value: 'story'
-              valueFrom: 
+              valueFrom:
                 configMapKeyRef:
                   name: data-store-env
                   key: folder
@@ -28,5 +28,8 @@ spec:
       volumes:
         - name: story-volume
           # emptyDir: {}
+          # hostPath:
+          #   path: /data
+          #   type: DirectoryOrCreate
           persistentVolumeClaim:
             claimName: host-pvc
